@@ -1,3 +1,6 @@
-file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")
-add_library("${CMAKE_PROJECT_NAME}-lib" ${sources})
-target_include_directories("${CMAKE_PROJECT_NAME}-lib" PUBLIC include)
+# file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")
+# add_library("${CMAKE_PROJECT_NAME}-lib" ${sources})
+# target_include_directories("${CMAKE_PROJECT_NAME}-lib" PUBLIC include)
+
+add_library("${CMAKE_PROJECT_NAME}-lib" INTERFACE)
+target_include_directories("${CMAKE_PROJECT_NAME}-lib" INTERFACE include)
