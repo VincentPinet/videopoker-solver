@@ -3,12 +3,13 @@
 
 #include "vps/combo.hpp"
 
+#include <immintrin.h>
+
 #include <bit>
 #include <cstdint>
 #include <limits>
 #include <ranges>
 #include <string_view>
-#include <vector>
 
 namespace vps {
 
@@ -16,12 +17,44 @@ namespace vps {
     public:
         constexpr bitcards() = default;
         constexpr bitcards(std::uint64_t a) : cards{a} {}
-
         constexpr bitcards(const std::string_view words) : cards{0} {
             for (const auto& word : words | std::views::split(' ')) {
                 cards += std::uint64_t{1} << offsets_rank(word[0]) << offsets_suit(word[1]);
             }
         }
+
+        class sentinel {};
+        class iterator {
+        public:
+            using iterator_category = std::input_iterator_tag;
+            using difference_type   = std::ptrdiff_t;
+            using value_type        = bitcards;
+
+            constexpr iterator() = default;
+            constexpr iterator(int k, std::uint64_t cards) : curr{~(~std::uint64_t{0} << k)}, mask{cards} {}
+
+            constexpr value_type operator*() const {
+                return bitcards{__builtin_ia32_pdep_di(curr, mask)};
+            }
+
+            constexpr iterator& operator++() {
+                std::uint64_t tmp = curr | (curr - 1);
+                curr = (tmp + 1) | (((~tmp & -~tmp) - 1) >> (std::countr_zero(curr) + 1));
+                return *this;
+            }
+
+            constexpr void operator++(int) { ++*this; }
+
+            constexpr bool operator==(const sentinel&) const { return curr >> std::popcount(mask); }
+
+        private:
+            std::uint64_t curr;
+            std::uint64_t mask;
+        };
+
+        constexpr iterator choose(int k) const { return iterator(k, cards); }
+        constexpr iterator begin() const { return iterator(1, cards); }
+        constexpr sentinel end() const { return sentinel(); }
 
         constexpr std::strong_ordering operator<=>(const bitcards& rhs) const = default;
 

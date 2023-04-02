@@ -98,3 +98,26 @@ TEST(bitcards_eval, nothing) {
 
   ASSERT_EQ(to_string(bitcards("2s 5h 7d Tc Ks").eval()), expected);
 }
+
+TEST(bitcards_iter, reconstruct) {
+
+  bitcards expected{"Js Jh 2d 7c Ks"};
+  bitcards reconstructed{};
+
+  for (const auto& card : expected)
+    reconstructed += card;
+
+  ASSERT_EQ(reconstructed, expected);
+}
+
+TEST(bitcards_iter, pascal_count) {
+
+  bitcards hand{"Js Jh 2d 7c Ks"};
+  int sum{};
+
+  for (int i = 1; i <= 5; i++)
+    for (auto it = hand.choose(i); it != hand.end(); ++it)
+      sum++;
+
+  ASSERT_EQ(sum, 5 + 10 + 10 + 5 + 1);
+}
