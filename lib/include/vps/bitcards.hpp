@@ -15,6 +15,8 @@ namespace vps {
 
     class bitcards {
     public:
+        static constexpr bitcards full_deck() { return bitcards{mask_full_deck}; }
+        
         constexpr bitcards() = default;
         constexpr bitcards(std::uint64_t a) : cards{a} {}
         constexpr bitcards(const std::string_view words) : cards{0} {
@@ -52,7 +54,8 @@ namespace vps {
             std::uint64_t mask;
         };
 
-        constexpr iterator choose(int k) const { return iterator(k, cards); }
+        constexpr auto choose(int k) const { return std::ranges::subrange(iterator(k, cards), sentinel()); }
+
         constexpr iterator begin() const { return iterator(1, cards); }
         constexpr sentinel end() const { return sentinel(); }
 
@@ -65,6 +68,8 @@ namespace vps {
         
         constexpr bitcards& operator+=(const bitcards& rhs) { cards |=  rhs.cards; return *this; }
         constexpr bitcards& operator-=(const bitcards& rhs) { cards &= ~rhs.cards; return *this; }
+
+        constexpr size_t size() const { return std::popcount(cards); }
 
         constexpr combo eval() const {
             std::uint64_t folded = fold2(cards, std::bit_or<>());
@@ -95,6 +100,7 @@ namespace vps {
     private:
         std::uint64_t cards;
 
+        static constexpr std::uint64_t mask_full_deck  = 0x1FFF1FFF1FFF1FFF;
         static constexpr std::uint64_t mask_jacks_plus = 0x1C011C011C011C01;
         static constexpr std::uint64_t mask_face       = 0x1E011E011E011E01;
         static constexpr std::uint64_t mask_suit       =             0xFFFF;
