@@ -3,7 +3,8 @@
 
 #include "vps/enum.hpp"
 
-#include <cstdint>
+#include <string>
+#include <utility>
 
 namespace vps {
 
@@ -17,10 +18,10 @@ namespace vps {
         full_house,
         four_of_a_kind,
         straight_flush,
-        royal_straight_flush,
+        royal_straight_flush
     };
 
-    template<>
+    template <>
     constexpr std::string to_string(combo val) {
         switch (val) {
             case combo::royal_straight_flush: return "royal_straight_flush";
@@ -33,7 +34,22 @@ namespace vps {
             case combo::two_pair: return "two_pair";
             case combo::jacks_or_better: return "jacks_or_better";
             case combo::nothing: return "nothing";
-            default: return std::to_string(static_cast<std::uint32_t>(val));
+            default: return std::to_string(std::to_underlying(val));
+        }
+    }
+
+    constexpr double payout(combo val) {
+        switch (val) {
+            case combo::royal_straight_flush: return 800;
+            case combo::straight_flush:       return 50;
+            case combo::four_of_a_kind:       return 25;
+            case combo::full_house:           return 9;
+            case combo::flush:                return 6;
+            case combo::straight:             return 4;
+            case combo::three_of_a_kind:      return 3;
+            case combo::two_pair:             return 2;
+            case combo::jacks_or_better:      return 1;
+            default: return 0;
         }
     }
 
