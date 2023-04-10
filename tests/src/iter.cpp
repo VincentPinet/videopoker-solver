@@ -1,4 +1,5 @@
 #include <vps/bitcards.hpp>
+#include <vps/solver.hpp>
 
 #include <gtest/gtest.h>
 
@@ -40,4 +41,9 @@ TEST(bitcards_iter, equivalence) {
         seen.insert(hand.equivalence());
 
     ASSERT_EQ(seen.size(), 134459);
+}
+
+TEST(bitcards_iter, solver) {
+
+    ASSERT_LT(std::abs(solver::solve() - 0.995439), 1e-7);
 }
