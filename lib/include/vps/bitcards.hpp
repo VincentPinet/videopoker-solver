@@ -71,6 +71,26 @@ namespace vps {
 
         constexpr size_t size() const { return std::popcount(cards); }
 
+        constexpr bitcards equivalence() const {
+            bitcards res{};
+            
+            std::uint64_t a = cards >> offsets_suit('c') & mask_suit;
+            std::uint64_t b = cards >> offsets_suit('d') & mask_suit;
+            std::uint64_t c = cards >> offsets_suit('h') & mask_suit;
+            std::uint64_t d = cards >> offsets_suit('s') & mask_suit;
+
+            if (a < d) std::swap(a, d);
+            if (b < c) std::swap(b, c);
+            if (a < b) std::swap(a, b);
+            if (c < d) std::swap(c, d);
+            if (b < c) std::swap(c, b);
+            
+            return (a << offsets_suit('c')) |
+                   (b << offsets_suit('d')) |
+                   (c << offsets_suit('h')) |
+                   (d << offsets_suit('s'));
+        }
+
         constexpr combo eval() const {
             std::uint64_t folded = fold2(cards, std::bit_or<>());
             switch (std::popcount(folded)) {
@@ -168,8 +188,18 @@ namespace vps {
                    std::popcount(hand >> offsets_suit('s') & mask_suit) == 5;
         }
 
+        friend std::hash<bitcards>;
     };
 
 } // namespace vps
+
+namespace std {
+    template <> 
+    struct hash<vps::bitcards> {
+        constexpr size_t operator()(const vps::bitcards& a) const { 
+            return a.cards;
+        }
+    };
+} // namespace std
 
 #endif // VIDEO_POKER_SOLVER_BITCARDS_HPP_

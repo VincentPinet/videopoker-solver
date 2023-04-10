@@ -2,6 +2,8 @@
 
 #include <gtest/gtest.h>
 
+#include <unordered_set>
+
 using namespace vps;
 
 constexpr size_t nck(int n, int k) {
@@ -20,7 +22,7 @@ TEST(bitcards_iter, reconstruct) {
     ASSERT_EQ(reconstructed, expected);
 }
 
-TEST(bitcards_iter, nchoosek_deck) {
+TEST(bitcards_iter, nchoosek) {
 
     bitcards deck = bitcards::full_deck();
     bitcards hand = bitcards{"As Kh Qd Jc 2s"};
@@ -29,4 +31,13 @@ TEST(bitcards_iter, nchoosek_deck) {
         ASSERT_EQ(std::ranges::distance(deck.choose(i)), nck(deck.size(), i));
         ASSERT_EQ(std::ranges::distance(hand.choose(i)), nck(hand.size(), i));
     }
+}
+
+TEST(bitcards_iter, equivalence) {
+    
+    std::unordered_set<bitcards> seen{};
+    for (const auto& hand : bitcards::full_deck().choose(5))
+        seen.insert(hand.equivalence());
+
+    ASSERT_EQ(seen.size(), 134459);
 }
