@@ -16,7 +16,7 @@ namespace {
         return nck(n - 1, k - 1) * n / k;
     }
 
-    constexpr double ev(const distribution& dist) {
+    double ev(const distribution& dist) {
         double res = 0;
         double sum = 0;
         for (const auto& [k, v] : dist) {
