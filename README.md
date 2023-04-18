@@ -4,7 +4,7 @@
 
 A simple approach to solve the game would be: for each of the 5 cards starting hand, find the maximum among the 32 ways of playing it by calculating the expected return of possible outcomes in the respective leftover deck.  
 
-${52 \choose 5}\sum_{k=0}^{5}{5\choose k}{47\choose 5-k} = 6,754,593,081,600$  
+$${52 \choose 5}\sum_{k=0}^{5}{5\choose k}{47\choose 5-k} = 6,754,593,081,600$$
 
 Depending on how efficient our combo detection is, this could take hours.. We can't afford that and will need some shortcuts.
 
@@ -27,10 +27,10 @@ Let's consider the following holdings and their outcome distribution when huntin
 
 | Holding | Royal | Straight Flush | Flush | Straight | Jacks or Better | Nothing | Total | EV |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-| K♥️ Q♥️ J♥️ T♥️ ~~2♥️~~ | 1 | 1 | 7 | 6 | 9 | ***23*** | 47 | 19.6809 |
-| K♥️ Q♥️ J♥️ T♥️ ~~J♠️~~ | 1 | 1 | 7 | 6 | ***8*** | 24 | 47 | 19.6596 |
-| K♥️ Q♥️ J♥️ T♥️ ~~9♠️~~ | 1 | 1 | 7 | ***5*** | 9 | 24 | 47 | 19.5957 |
-| K♥️ Q♥️ J♥️ T♥️ ~~2♠️~~ | 1 | 1 | ***6*** | 6 | 9 | 24 | 47 | 19.5532 |
+| K♥️ Q♥️ J♥️ T♥️ ~~2♠️~~ | 1 | 1 | 7 | 6 | 9 | ***23*** | 47 | 19.680 |
+| K♥️ Q♥️ J♥️ T♥️ ~~J♠️~~ | 1 | 1 | 7 | 6 | ***8*** | 24 | 47 | 19.659 |
+| K♥️ Q♥️ J♥️ T♥️ ~~9♠️~~ | 1 | 1 | 7 | ***5*** | 9 | 24 | 47 | 19.595 |
+| K♥️ Q♥️ J♥️ T♥️ ~~2♥️~~ | 1 | 1 | ***6*** | 6 | 9 | 24 | 47 | 19.553 |
 
 At first it might seems surprising why the worst holding actually has the best expected return.
 But when we think about it, breaking a *good* combination in order to chase that A♥️ worsen the quality of the fallback combo when we don't hit.  
@@ -60,7 +60,7 @@ We need something to represent a collection of cards. Luckily for us video poker
 | ♣️ |12|11|10| 9| 8| 7| 6| 5| 4| 3| 2| 1| 0|
 
 With the following bits being unused 63, 62, 61, 47, 46, 45, 31, 30, 29, 15, 14, 13.  
-I thought it might ease the compiler to align the suits on 16 bits since we are going to fold them onto each other with various bitwise operator to detect pairs and whatnot.
+I thought it might ease the compiler to align the suits on 16 bits since we are going to fold them onto each other with bitwise *and* to identify a four of a kind for instance. Most of the time *or* and *xor* in addition of an abundant use of the *popcnt* instruction for various pairs detection, even a little of *ctz* and *clz* for straights.
 
 Another thing we are going to want is an easy way to iterate over the n choose k distinct subsets of our bitcards, whether it's for the different ways of holding a hand or the possible outcomes of deck.  
 For algorithmic readability purpose I wanted an aesthetic user api and it was a good opportunity to have fun the the c++20 std::ranges.
