@@ -35,7 +35,7 @@ TEST(bitcards_iter, nchoosek) {
 }
 
 TEST(bitcards_iter, equivalence) {
-    
+
     std::unordered_set<bitcards> seen{};
     for (const auto& hand : bitcards::full_deck().choose(5))
         seen.insert(hand.equivalence());

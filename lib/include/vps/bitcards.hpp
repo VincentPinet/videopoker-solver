@@ -16,7 +16,7 @@ namespace vps {
     class bitcards {
     public:
         static constexpr bitcards full_deck() { return bitcards{mask_full_deck}; }
-        
+
         constexpr bitcards() = default;
         constexpr explicit bitcards(std::uint64_t a) : cards{a} {}
         constexpr explicit bitcards(const std::string_view words) : cards{0} {
@@ -62,10 +62,10 @@ namespace vps {
         constexpr std::strong_ordering operator<=>(const bitcards& rhs) const = default;
 
         constexpr bool operator[](std::size_t pos) const { return cards >> pos & 1; }
-        
+
         constexpr bitcards operator+(const bitcards& rhs) const { return bitcards{cards |  rhs.cards}; }
         constexpr bitcards operator-(const bitcards& rhs) const { return bitcards{cards & ~rhs.cards}; }
-        
+
         constexpr bitcards& operator+=(const bitcards& rhs) { cards |=  rhs.cards; return *this; }
         constexpr bitcards& operator-=(const bitcards& rhs) { cards &= ~rhs.cards; return *this; }
 
@@ -82,7 +82,7 @@ namespace vps {
             if (a < b) std::swap(a, b);
             if (c < d) std::swap(c, d);
             if (b < c) std::swap(c, b);
-            
+
             return bitcards{(a << offsets_suit('c')) |
                             (b << offsets_suit('d')) |
                             (c << offsets_suit('h')) |
@@ -158,7 +158,7 @@ namespace vps {
             return op(op(hand >> offsets_suit('c') & mask_suit, hand >> offsets_suit('d') & mask_suit),
                       op(hand >> offsets_suit('h') & mask_suit, hand >> offsets_suit('s') & mask_suit));
         }
-        
+
         static constexpr bool is_straight(std::uint64_t folded) {
             return std::numeric_limits<std::uint64_t>::digits - std::countl_zero(folded) - std::countr_zero(folded) == 5;
         }
@@ -192,9 +192,9 @@ namespace vps {
 } // namespace vps
 
 namespace std {
-    template <> 
+    template <>
     struct hash<vps::bitcards> {
-        constexpr size_t operator()(const vps::bitcards& a) const { 
+        constexpr size_t operator()(const vps::bitcards& a) const {
             return a.cards;
         }
     };
