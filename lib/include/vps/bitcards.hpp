@@ -50,8 +50,8 @@ namespace vps {
             constexpr bool operator==(const sentinel&) const { return curr >> std::popcount(mask); }
 
         private:
-            std::uint64_t curr;
-            std::uint64_t mask;
+            std::uint64_t curr{};
+            std::uint64_t mask{};
         };
 
         constexpr auto choose(int k) const { return std::ranges::subrange(iterator(k, cards), sentinel()); }
@@ -116,7 +116,7 @@ namespace vps {
         }
 
     private:
-        std::uint64_t cards;
+        std::uint64_t cards{};
 
         static constexpr std::uint64_t mask_full_deck  = 0x1FFF1FFF1FFF1FFF;
         static constexpr std::uint64_t mask_jacks_plus = 0x1C011C011C011C01;
