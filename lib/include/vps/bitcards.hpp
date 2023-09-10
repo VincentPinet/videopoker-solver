@@ -18,8 +18,8 @@ namespace vps {
         static constexpr bitcards full_deck() { return bitcards{mask_full_deck}; }
         
         constexpr bitcards() = default;
-        constexpr bitcards(std::uint64_t a) : cards{a} {}
-        constexpr bitcards(const std::string_view words) : cards{0} {
+        constexpr explicit bitcards(std::uint64_t a) : cards{a} {}
+        constexpr explicit bitcards(const std::string_view words) : cards{0} {
             for (const auto& word : words | std::views::split(' ')) {
                 cards += std::uint64_t{1} << offsets_rank(word[0]) << offsets_suit(word[1]);
             }
@@ -63,8 +63,8 @@ namespace vps {
 
         constexpr bool operator[](std::size_t pos) const { return cards >> pos & 1; }
         
-        constexpr bitcards operator+(const bitcards& rhs) const { return cards |  rhs.cards; }
-        constexpr bitcards operator-(const bitcards& rhs) const { return cards & ~rhs.cards; }
+        constexpr bitcards operator+(const bitcards& rhs) const { return bitcards{cards |  rhs.cards}; }
+        constexpr bitcards operator-(const bitcards& rhs) const { return bitcards{cards & ~rhs.cards}; }
         
         constexpr bitcards& operator+=(const bitcards& rhs) { cards |=  rhs.cards; return *this; }
         constexpr bitcards& operator-=(const bitcards& rhs) { cards &= ~rhs.cards; return *this; }
@@ -72,8 +72,6 @@ namespace vps {
         constexpr size_t size() const { return std::popcount(cards); }
 
         constexpr bitcards equivalence() const {
-            bitcards res{};
-            
             std::uint64_t a = cards >> offsets_suit('c') & mask_suit;
             std::uint64_t b = cards >> offsets_suit('d') & mask_suit;
             std::uint64_t c = cards >> offsets_suit('h') & mask_suit;
@@ -85,10 +83,10 @@ namespace vps {
             if (c < d) std::swap(c, d);
             if (b < c) std::swap(c, b);
             
-            return (a << offsets_suit('c')) |
-                   (b << offsets_suit('d')) |
-                   (c << offsets_suit('h')) |
-                   (d << offsets_suit('s'));
+            return bitcards{(a << offsets_suit('c')) |
+                            (b << offsets_suit('d')) |
+                            (c << offsets_suit('h')) |
+                            (d << offsets_suit('s'))};
         }
 
         constexpr combo eval() const {
