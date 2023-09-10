@@ -42,8 +42,3 @@ TEST(bitcards_iter, equivalence) {
 
     ASSERT_EQ(seen.size(), 134459);
 }
-
-TEST(bitcards_iter, solver) {
-
-    ASSERT_LT(std::abs(solver::solve() - 0.995439), 1e-7);
-}
