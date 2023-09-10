@@ -5,6 +5,7 @@
 
 #include <immintrin.h>
 
+#include <algorithm>
 #include <bit>
 #include <cstdint>
 #include <limits>
@@ -18,12 +19,12 @@ namespace vps {
         static constexpr bitcards full_deck() { return bitcards{mask_full_deck}; }
 
         constexpr bitcards() = default;
-        constexpr explicit bitcards(std::uint64_t a) : cards{a} {}
-        constexpr explicit bitcards(const std::string_view words) : cards{0} {
-            for (const auto& word : words | std::views::split(' ')) {
-                cards += std::uint64_t{1} << offsets_rank(word[0]) << offsets_suit(word[1]);
-            }
-        }
+        constexpr explicit bitcards(const std::uint64_t a) : cards{a} {}
+        constexpr explicit bitcards(const std::string_view words)
+            : cards{std::ranges::fold_left(words | std::views::split(' '), 0,
+                [](auto acc, const auto word) {
+                    return acc + (std::uint64_t{1} << offsets_rank(word[0]) << offsets_suit(word[1]));
+                })} {}
 
         class sentinel {};
         class iterator {

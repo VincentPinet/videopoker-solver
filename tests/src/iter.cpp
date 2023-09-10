@@ -3,6 +3,8 @@
 
 #include <gtest/gtest.h>
 
+#include <algorithm>
+#include <functional>
 #include <unordered_set>
 
 using namespace vps;
@@ -15,12 +17,7 @@ constexpr size_t nck(int n, int k) {
 TEST(bitcards_iter, reconstruct) {
 
     bitcards expected{"Js Jh 2d 7c Ks"};
-    bitcards reconstructed{};
-
-    for (const auto& card : expected)
-      reconstructed += card;
-
-    ASSERT_EQ(reconstructed, expected);
+    ASSERT_EQ(std::ranges::fold_left(expected, bitcards{}, std::plus<>()), expected);
 }
 
 TEST(bitcards_iter, nchoosek) {
