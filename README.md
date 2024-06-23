@@ -32,11 +32,11 @@ Let's consider the following holdings and their outcome distribution when huntin
 | K♥️ Q♥️ J♥️ T♥️ ~~9♠️~~ | 1 | 1 | 7 | ***5*** | 9 | 24 | 47 | 19.595 |
 | K♥️ Q♥️ J♥️ T♥️ ~~2♥️~~ | 1 | 1 | ***6*** | 6 | 9 | 24 | 47 | 19.553 |
 
-At first it might seems surprising why the worst holding actually has the best expected return.
+At first it might seem surprising why the worst holding actually has the best expected return.
 But when we think about it, breaking a *good* combination in order to chase that A♥️ worsen the quality of the fallback combo when we don't hit.  
 But more importantly, even though the remaining 47 cards of the deck, and therefore the expected return, are not exactly the same in each of those holdings. The intuition is that it's close enough that there must be a way to jump from one to another without having the go through the whole deck again to compute it.
 
-Now let's consider this 4 cards holding with, subsequently, a deck of 48 cards left:
+Now let's consider these 4 cards holding with, subsequently, a deck of 48 cards left:
 
 | Holding | Royal | Straight Flush | Flush | Straight | Jacks or Better | Nothing | Total |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
@@ -50,7 +50,7 @@ Complexity wise we basically converted the ${47\choose k}$ to a fixed cost for p
 
 ## Let the bit hacking begin
 
-We need something to represent a collection of cards. Luckily for us video poker is played with a 52 unique cards. Meaning we can fit all the information inside a 64 bits integer, here is the layout I landed on:
+We need something to represent a collection of cards. Luckily for us video poker is played with 52 unique cards. Meaning we can fit all the information inside a 64 bits integer, here is the layout I landed on:
 
 | \ |K |Q |J |T |9 |8 |7 |6 |5 |4 |3 |2 |A |
 |---|--|--|--|--|--|--|--|--|--|--|--|--|--|
@@ -72,9 +72,9 @@ The latest constexpr [*\<bit\>*](https://en.cppreference.com/w/cpp/header/bit) h
 
 ## The `constexpr` journey
 
-One of the self inflicted challenge of this project was to make everything constexpr. If you intentional code things in a non-configurable way with an hardcoded variant, every single information should be knowable at compile time.  
+One of the self-inflicted challenge of this project was to make everything constexpr. If you intentional code things in a non-configurable way with an hardcoded variant, every single information should be knowable at compile time.  
 But I underestimated the inefficiency of the compiler optimization compare to plain runtime.  
-For instance the following snippet of code, naive solver approach that return the expected value of a fixed hand under optimal play  which fully lives in a constexpr context:
+For instance the following snippet of code, naive solver approach that return the expected value of a fixed hand under optimal play which fully lives in a constexpr context:
 
 ```c++
 static constexpr double solve(const vps::bitcards& hand) {
@@ -100,7 +100,7 @@ int main() {
 }
 ```
 
-Would take about 20 ms without the constexpr specifier; but somehow doesn't compile at all after more than 30 minutes even with 16 threads while using 40 Go of swap..  
+Would take about 20ms without the constexpr specifier; but somehow doesn't compile at all after more than 30 minutes even with 16 threads while using 40 Go of swap..  
 If solving ONE hand wasn't trivially doable, the whole game is probably impossible. But because I am not willing to go down without at least a small victory; if we unfairly remove from consideration throwing away all five (and after some tweaking with the `-fconstexpr-*` compile options), the resulting binary looks like this:
 
 ```nasm
@@ -113,7 +113,7 @@ Useless but neat!
 
 ## Solver
 
-The main dream of the project being dead in the water at this stage; For the precomputing storage, I decided not to bother to much and abuse *unordered_map* for simplicity and code readability, which is not constexpr compliant. You can definitely optimize this a lot with statically allocated array and a smart way to map hand to indices. Or even storing on disk the distributions, also worth noting it's not payout table dependant so you can still do runtime configuration and benefit from this. The program runs in about 6 seconds, it's fine by me for now.
+The main dream of the project being dead in the water at this stage; For the precomputing storage, I decided not to bother to much and abuse *unordered_map* for simplicity and code readability, which is not constexpr compliant. You can definitely optimize this a lot with statically allocated array and a smart way to map hand to indices. Or even storing on disk the distributions, also worth noting it's not payout table dependent so you can still do runtime configuration and benefit from this. The program runs in about 4 seconds, good enough for now.
 
 ## Results
 
